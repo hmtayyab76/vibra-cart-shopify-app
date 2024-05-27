@@ -43,7 +43,6 @@ export async function action({ request }) {
         description: settings.description,
       },
     });
-
     return json(settings);
   }
 }
