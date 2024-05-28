@@ -29,3 +29,17 @@ model Settings {
   name        String
   description String
 }
+
+model Student {
+  studentId   Int     @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  email       String  @unique
+  age         Int
+  grade       String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  phoneNumber String
+}

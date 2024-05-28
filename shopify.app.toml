@@ -3,7 +3,7 @@
 client_id = "254c161a5700fcb0582c9e745ca2edb0"
 name = "vibra-cart"
 handle = "vibra-cart"
-application_url = "https://scary-icq-permalink-foo.trycloudflare.com"
+application_url = "https://retain-wisdom-scholarships-arrow.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://scary-icq-permalink-foo.trycloudflare.com/auth/callback",
-  "https://scary-icq-permalink-foo.trycloudflare.com/auth/shopify/callback",
-  "https://scary-icq-permalink-foo.trycloudflare.com/api/auth/callback"
+  "https://retain-wisdom-scholarships-arrow.trycloudflare.com/auth/callback",
+  "https://retain-wisdom-scholarships-arrow.trycloudflare.com/auth/shopify/callback",
+  "https://retain-wisdom-scholarships-arrow.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

@@ -7,24 +7,35 @@ import {
   InlineGrid,
   TextField,
   Button,
+  DataTable,
+  LegacyCard
+
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useState } from "react";
 import { json } from "@remix-run/node"; 
-import { useLoaderData, Form } from "@remix-run/react";
+import { useLoaderData, Form, useFetcher } from "@remix-run/react";
 import db from '../db.server'
-
 
 export async function loader() {
   let settings = await db.settings.findMany();
   console.log("settings ------>", settings);
-  return json(settings);
+
+  // Format the settings data for the DataTable
+  const rows = settings.map(setting => [
+    setting.name, 
+    setting.description, 
+    setting.id,
+  { id: setting.id }
+  ]);
+
+  return json({ settings, rows });
 }
 
 export async function action({ request }) {
   let formData = await request.formData();
   let settings = Object.fromEntries(formData);
-  
+
   if (settings.deleteId) {
     // If the deleteId field exists in the form data, delete the record with that ID
     await db.settings.delete({
@@ -46,9 +57,22 @@ export async function action({ request }) {
     return json(settings);
   }
 }
+function DeleteButton({ id }) {
+  const fetcher = useFetcher();
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      fetcher.submit({ deleteId: id }, { method: "post" });
+    }
+  };
+
+  return (
+    <Button onClick={handleDelete}>Delete</Button>
+  );
+}
 export default function AdditionalPage() {
   let settings = useLoaderData();
+  let { rows } = useLoaderData();
   const [formState, setFormState] = useState(settings);
   const [deleteId, setDeleteId] = useState('');
 
@@ -65,11 +89,18 @@ export default function AdditionalPage() {
     if (response.ok) {
       // If response is successful, show an alert
       alert("Action successful!");
+      window.location.reload();
     } else {
       // If response fails, show an alert
       alert("Action failed!");
     }
   };
+  const dataTableRows = rows.map(row => [
+    row[2],  // ID
+    row[0],  // Product Name
+    row[1],  // Description
+    <DeleteButton key={row[2]} id={row[2]} />  // Delete Button
+  ]);
 
   return (
     <>
@@ -88,7 +119,7 @@ export default function AdditionalPage() {
     >
       <TitleBar title="App Settings" />
       <BlockStack gap={{ xs: "800", sm: "400" }}>
-        <InlineGrid columns={{ xs: "1fr", md: "2fr 2fr" }} gap="400">
+        <InlineGrid columns={{ xs: "1fr", md: "1fr 2fr" }} gap="400">
           <Box
             as="section"
             paddingInlineStart={{ xs: 400, sm: 0 }}
@@ -112,6 +143,7 @@ export default function AdditionalPage() {
                   value={formState?.name} 
                   onChange={(value) => setFormState({ ...formState, name: value })} 
                 />
+                
                 <TextField 
                   label="Description" 
                   name="description"
@@ -172,6 +204,40 @@ export default function AdditionalPage() {
     
      
     </Page>
+ 
+
+
+ 
+
+  
+    <Page title="Product Records">
+        <LegacyCard>
+          <DataTable
+            showTotalsInFooter
+            columnContentTypes={[
+              'numeric',
+              'text',
+              'text',
+              'text'
+            ]}
+            headings={[
+              'ID',
+              'Product',
+              'Description',
+              'Actions'
+            ]}
+            rows={dataTableRows}
+            // Optionally, you can add totals if needed
+            // totals={['', '', '', '', '$155,830.00']}
+            // totalsName={{
+            //   singular: 'Total net sales',
+            //   plural: 'Total net sales',
+            // }}
+           
+          />
+        </LegacyCard>
+      </Page>
+
     </>
   );
 }
